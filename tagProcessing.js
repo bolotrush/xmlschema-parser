@@ -29,17 +29,26 @@ function tagElement(node) {
 
 /***
  * Принимает на вход Node Restriction
- * Выводит объект с информацией о родительском теге, на чем базируется ограничение и объект ограничений (ограничение(название тега) - значение)
+ * Выводит объект с на чем базируется ограничение и объект ограничений (ограничение(название тега) - значение)
  ***/
 function tagRestriction(node) {
 
     var oRestriction = {};
-    oRestriction ["parentTag"] = node.parentNode.nodeName;
-    oRestriction["parentName"] = node.parentNode.getAttribute('name');
     oRestriction["base"] = node.getAttribute('base');
     oRestriction["restrictions"] = {};
     for (var i=0; i<node.childNodes.length; i++) {
-        oRestriction["restrictions"][node.childNodes[i].nodeName] = node.childNodes[i].attributes[0].value;
+
+        if (node.childNodes[i].nodeName === "xs:sequence" || node.childNodes[i].nodeName === "xs:all" || node.childNodes[i].nodeName === "xs:choice") {
+            oRestriction["children"] = [];
+            var childNode = node.childNodes[i];
+            for (var j = 0; j < childNode.childNodes.length; j++) {
+
+                oRestriction["children"].push(defineTag(childNode.childNodes[j]))
+            }
+        } else {
+
+            oRestriction["restrictions"][node.childNodes[i].nodeName] = node.childNodes[i].attributes[0].value;
+        }
     }
 
     return oRestriction;
