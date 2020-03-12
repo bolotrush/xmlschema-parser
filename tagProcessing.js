@@ -44,3 +44,19 @@ function tagRestriction(node) {
 
     return oRestriction;
 }
+
+/***
+ * Принимает на вход node - индикатор очередности (sequence, all  или choice)
+ * Выводит объект с информацией о дочерних элементах в виде массива объектов
+ ***/
+function tagFilling(node) {
+
+    var oFilling = {};
+    var tagName = node.nodeName.slice(3); //отрезаем xs:
+    oFilling[tagName] = [];
+    for (var i=0; i<node.childNodes.length; i++) {
+
+        oFilling[tagName].push(defineTag(node.childNodes[i]));
+    }
+    return oFilling;
+}
