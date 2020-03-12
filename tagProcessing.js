@@ -6,7 +6,8 @@ function tagAnnotation(node) {
 
     var oComment = {};
     oComment["comment"] = node.getElementsByTagName("xs:documentation")[0].childNodes[0].nodeValue;
-    return(oComment);
+
+    return oComment;
 }
 
 /***
@@ -20,7 +21,6 @@ function tagElement(node) {
 
     for (var i=0; i<node.childNodes.length; i++) {
 
-        oElement[node.childNodes.nodeName] = {};
         oElement[node.childNodes.nodeName] = defineTag(node.childNodes[i]);
     }
     return oElement;
@@ -39,7 +39,7 @@ function tagRestriction(node) {
 
         if (node.childNodes[i].nodeName === "xs:sequence" || node.childNodes[i].nodeName === "xs:all" || node.childNodes[i].nodeName === "xs:choice") {
 
-            defineTag(node.childNodes[i]);
+            oRestriction[node.childNodes[i].nodeName] = defineTag(node.childNodes[i]);
         } else {
 
             oRestriction["restrictions"][node.childNodes[i].nodeName] = node.childNodes[i].attributes[0].value;
@@ -56,20 +56,24 @@ function tagRestriction(node) {
 function tagFilling(node) {
 
     var oFilling = {};
-    var tagName = node.nodeName.slice(3); //отрезаем xs:
-    oFilling[tagName] = {};
     for (var i=0; i<node.childNodes.length; i++) {
 
-        oFilling[tagName][node.childNodes[i].nodeName]=defineTag(node.childNodes[i]);
+        oFilling[node.childNodes[i].nodeName]=defineTag(node.childNodes[i]);
     }
     return oFilling;
 }
 
 function tagType(node) {
-    var oType = {};
+    // var oType = {};
+    // oType["attributes"] = getAttributes(node.attributes);
+    // for (var i=0; i<node.childNodes.length; i++) {
+    //
+    //     oType[node.childNodes.nodeName] = defineTag(node.childNodes[i]);
+    // }
+    return (tagElement(node));
+}
 
-    for (var i=0; i<node.childNodes.length; i++) {
-        oType[node.childNodes.nodeName] = {};
-        oType[node.childNodes.nodeName] = defineTag(node.childNodes[i]);
-    }
+function tagContent(node) {
+
+    return (tagFilling(node));
 }

@@ -55,9 +55,13 @@ function defineTag(node){
             break;
 
         case "xs:complexContent":
+
+            oRandomObject = tagContent(node);
             break;
 
         case "xs:simpleContent":
+
+            oRandomObject = tagContent(node);
             break;
 
         //sequence, all & choice - индикаторы очерёдности. Не уверена, что их требуется обрабатывать
@@ -116,20 +120,17 @@ function readExternalType(node) {
  * ***/
 function parser(xsd) {
 
-    //oTypes = defineTag()
-    var aComplexTypes = xsd.getElementsByTagName("xs:complexType");
-    for (var i=0; i<aComplexTypes.length; i++) {
-        getAttributes(aComplexTypes[i].attributes);
-        for (var j=0; j<aComplexTypes[i].childNodes.length; j++){
-            switch (aComplexTypes[i].childNodes[j]) {
+    readExternalType(xsd);
+    var aElements = xsd.getElementsByTagName("xs:element");
 
+    for (var i=0; i<aElements.length; i++) {
+        var elementName = aElements[i].getAttribute('name');
+        oElements[elementName] = {};
 
+        for (var j=0; j<aElements[i].childNodes.length; j++) {
 
-            }
+            oElements[elementName][aElements[i].childNodes[j].nodeName] = defineTag(aElements[i].childNodes[j]);
         }
-
-
-    }
-    var aSimpleTypes = xsd.getElementsByTagName("xs:simpleType");
+   }
 }
 
