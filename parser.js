@@ -72,7 +72,7 @@
 
 var oTypes = {};
 var oElements = {};
-var aAttributes = ["name", "type", "form", "minOccurs", "maxOccurs", "base", "value"]; //всевозможные атрибуты, что я придумала. Думала может использовать потом для indexOf, чтобы сразу определять, что за атрибут перед нами. Но пока не знаю
+var aAttributes = ["name", "type", "form", "minOccurs", "maxOccurs", "base", "value", "ref", "substitutionGroup", "default", "fixed", "nillable"]; //всевозможные атрибуты, что я придумала. Думала может использовать потом для indexOf, чтобы сразу определять, что за атрибут перед нами. Но пока не знаю
 
 /***
  * Принимает на вход a NamedNodeMap (attribute list) containing the attributes of the selected node
@@ -94,6 +94,7 @@ function getAttributes(attributes) {
 function defineTag(node){
 
     var oRandomObject = {};
+    var i=0;
 
     switch(node.nodeName){
 
@@ -105,10 +106,11 @@ function defineTag(node){
             break;
 
         case "xs:element":
+            oRandomObject = tagElement(node);
             break;
 
         case "xs:restriction":
-            oRandomObject = tagRestriction(node)
+            oRandomObject = tagRestriction(node);
             break;
 
         case "xs:complexType":
@@ -117,13 +119,35 @@ function defineTag(node){
         case "xs:simpleType":
             break;
 
+        case "xs:complexContent":
+            break;
+
+        case "xs:simpleContent":
+            break;
+
+        //sequence, all & lchoice - индикаторы очерёдности. Не уверена, что их требуется обрабатывать
         case "xs:sequence":
+            oRandomObject["sequence"] = [];
+            for (i=0; i<node.childNodes.length; i++) {
+
+                oRandomObject["sequence"].push(defineTag(node.childNodes[i]))
+            }
             break;
 
         case "xs:all":
+            oRandomObject["all"] = [];
+            for (i=0; i<node.childNodes.length; i++) {
+
+                oRandomObject["all"].push(defineTag(node.childNodes[i]))
+            }
             break;
 
         case "xs:choice":
+            oRandomObject["choice"] = [];
+            for (i=0; i<node.childNodes.length; i++) {
+
+                oRandomObject["choice"].push(defineTag(node.childNodes[i]))
+            }
             break;
 
         case "xs:group":
@@ -131,51 +155,6 @@ function defineTag(node){
     }
 
     return oRandomObject;
-}
-/***
- * Принимает на вход Node Annotation
- * Выводит вот этот текст-описание (вроде, как, я пока ничего не запускала и не проверяла. У меня даже HTML пока нет)
- ***/
-function tagAnnotation(node) {
-
-    var oComment = {};
-    oComment["comment"] = node.getElementsByTagName("xs:documentation")[0].childNodes[0].nodeValue;
-    return(oComment);
-}
-
-function tagElement(node) {
-
-    var oElement = {};
-    var oAttributes = getAttributes(node.attributes);
-    var aChild = [];
-    for (var i=0; i<node.childNodes.length; i++) {
-
-        aChild.push(defineTag(node.childNodes[i]))
-    }
-
-
-}
-
-function ruleOfOrder() {
-    //sequence choice all
-}
-
-/***
- * Принимает на вход Node Restriction
- * Выводит объект с информацией о родительском теге, на чем базируется ограничение и объект ограничений (ограничение(название тега) - значение)
- ***/
-function tagRestriction(node) {
-
-    var oRestriction = {};
-    oRestriction ["parentTag"] = node.parentNode.nodeName;
-    oRestriction["parentName"] = node.parentNode.getAttribute('name');
-    oRestriction["base"] = node.getAttribute('base');
-    oRestriction["restrictions"] = {};
-    for (var i=0; i<node.childNodes.length; i++) {
-        oRestriction["restrictions"][node.childNodes[i].nodeName] = node.childNodes[i].attributes[0].value;
-    }
-
-    return oRestriction;
 }
 
 /***
