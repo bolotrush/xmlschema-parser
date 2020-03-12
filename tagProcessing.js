@@ -5,7 +5,6 @@
 function tagAnnotation(node) {
 
     var oComment = {};
-    oComment["tag"] = "annotation";
     oComment["comment"] = node.getElementsByTagName("xs:documentation")[0].childNodes[0].nodeValue;
     return(oComment);
 }
@@ -17,12 +16,12 @@ function tagAnnotation(node) {
 function tagElement(node) {
 
     var oElement = {};
-    oElement["tag"] = "element";
     oElement["attributes"] = getAttributes(node.attributes);
-    oElement["children"] = [];
+
     for (var i=0; i<node.childNodes.length; i++) {
 
-        oElement["children"].push(defineTag(node.childNodes[i]))
+        oElement[node.childNodes.nodeName] = {};
+        oElement[node.childNodes.nodeName] = defineTag(node.childNodes[i]);
     }
     return oElement;
 }
@@ -39,12 +38,8 @@ function tagRestriction(node) {
     for (var i=0; i<node.childNodes.length; i++) {
 
         if (node.childNodes[i].nodeName === "xs:sequence" || node.childNodes[i].nodeName === "xs:all" || node.childNodes[i].nodeName === "xs:choice") {
-            oRestriction["children"] = [];
-            var childNode = node.childNodes[i];
-            for (var j = 0; j < childNode.childNodes.length; j++) {
 
-                oRestriction["children"].push(defineTag(childNode.childNodes[j]))
-            }
+            defineTag(node.childNodes[i]);
         } else {
 
             oRestriction["restrictions"][node.childNodes[i].nodeName] = node.childNodes[i].attributes[0].value;
@@ -62,10 +57,19 @@ function tagFilling(node) {
 
     var oFilling = {};
     var tagName = node.nodeName.slice(3); //отрезаем xs:
-    oFilling[tagName] = [];
+    oFilling[tagName] = {};
     for (var i=0; i<node.childNodes.length; i++) {
 
-        oFilling[tagName].push(defineTag(node.childNodes[i]));
+        oFilling[tagName][node.childNodes[i].nodeName]=defineTag(node.childNodes[i]);
     }
     return oFilling;
+}
+
+function tagType(node) {
+    var oType = {};
+
+    for (var i=0; i<node.childNodes.length; i++) {
+        oType[node.childNodes.nodeName] = {};
+        oType[node.childNodes.nodeName] = defineTag(node.childNodes[i]);
+    }
 }

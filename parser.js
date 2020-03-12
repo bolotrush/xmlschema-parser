@@ -45,9 +45,13 @@ function defineTag(node){
             break;
 
         case "xs:complexType":
+
+            oRandomObject = tagType(node);
             break;
 
         case "xs:simpleType":
+
+            oRandomObject = tagType(node);
             break;
 
         case "xs:complexContent":
@@ -79,11 +83,40 @@ function defineTag(node){
     return oRandomObject;
 }
 
+function readExternalType(node) {
+
+    var aComplexTypes = node.getElementsByTagName("xs:complexType");
+    var aSimpleTypes = node.getElementsByTagName("xs:simpleType");
+    var typeName = "";
+    var i=0;
+    var j=0;
+    for (i; i<aComplexTypes.length; i++){
+
+        typeName = aComplexTypes[i].getAttribute('name');
+        oTypes[typeName] = {};
+        for (j; j<aComplexTypes[i].childNodes.length; j++) {
+            //надо сделать так, чтобы был объект {typeName: {имя тега дитя: {инфа о нём}, имя тега дитя: {инфа о нём}, имя тега дитя: {инфа о нём}}}
+            oTypes[typeName][aComplexTypes[i].childNodes[j].nodeName] = defineTag(aComplexTypes[i].childNodes[j]);
+        }
+    }
+    for (i=0; i<aSimpleTypes.length; i++){
+
+        typeName = aSimpleTypes[i].getAttribute('name');
+        oTypes[typeName] = {};
+        for (j=0; j<aSimpleTypes[i].childNodes.length; j++) {
+            //надо сделать так, чтобы был объект typeName = {имя тега дитя: {инфа о нём}, имя тега дитя: {инфа о нём}, имя тега дитя: {инфа о нём}}
+            oTypes[typeName][aSimpleTypes[i].childNodes[j].nodeName] = defineTag(aSimpleTypes[i].childNodes[j]);
+        }
+    }
+}
+
+
 /***
  * Думаю, что здесь будет вход
  * ***/
 function parser(xsd) {
 
+    //oTypes = defineTag()
     var aComplexTypes = xsd.getElementsByTagName("xs:complexType");
     for (var i=0; i<aComplexTypes.length; i++) {
         getAttributes(aComplexTypes[i].attributes);
