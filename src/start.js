@@ -99,13 +99,6 @@ function tagAnnotation(node) {
     return node.getElementsByTagName("xs:documentation")[0].childNodes[0].nodeValue;
 }
 
-function tagElement() {
-}
-
-function ruleOfOrder() {
-    //sequence choice all
-}
-
 /***
  * Принимает на вход Node Restriction
  * Выводит объект с информацией о родительском теге, на чем базируется ограничение и объект ограничений (ограничение(название тега) - значение)
@@ -123,25 +116,3 @@ function tagRestriction(node) {
 
     return oRestriction;
 }
-
-/***
- * Думаю, что здесь будет вход
- * ***/
-function parser(xsd) {
-
-    var aComplexTypes = xsd.getElementsByTagName("xs:complexType");
-    for (var i=0; i<aComplexTypes.length; i++) {
-        getAttributes(aComplexTypes[i].attributes);
-        for (var j=0; j<aComplexTypes[i].childNodes.length; j++){
-            switch (aComplexTypes[i].childNodes[j]) {
-
-
-
-            }
-        }
-
-
-    }
-    var aSimpleTypes = xsd.getElementsByTagName("xs:simpleType");
-}
-
